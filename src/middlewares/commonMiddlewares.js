@@ -19,8 +19,31 @@ const mid4= function ( req, res, next) {
     console.log("Hi I am a middleware named Mid4")
     next()
 }
+const mid5=function (req, res, next){
+    console.log("Hi print currentdate")
+    next()
+}
+const assignment= function (req, res,next){
+    
+    let currentdate = new Date(); 
+    let datetime = currentdate.getDate() + " "
+                    + (currentdate.getMonth()+1)  + " " 
+                    + currentdate.getFullYear() + "  "  
+                    + currentdate.getHours() + ":"  
+                    + currentdate.getMinutes() + ":" 
+                    + currentdate.getSeconds();
+    let ip =req.ip
+    let url = req.originalUrl
+    
+     console.log(`${datetime}, ${ip}, ${url}`)
+    
+     
+    }
+    
 
 module.exports.mid1= mid1
 module.exports.mid2= mid2
 module.exports.mid3= mid3
 module.exports.mid4= mid4
+module.exports.mid5= mid5
+module.exports.assignment=assignment
