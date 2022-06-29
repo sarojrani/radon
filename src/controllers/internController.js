@@ -2,7 +2,7 @@
 const internModel = require("../models/internModel")
 const mongoose = require("mongoose");
 const collegeModel = require("../models/collegeModel");
-// const ObjectId = mongoose.Schema.Types.ObjectId
+
 
 // ==+==+==+==[Validation Functions]==+==+==+==+=
 

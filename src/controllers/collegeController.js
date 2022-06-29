@@ -5,13 +5,6 @@ const internModel = require("../models/internModel");
 
 // ==+==+==+==[Validation Functions]==+==+==+==+=
 
-const isValid = function (value) {
-    if (typeof value === "undefined" || value === null) return false;
-    if (typeof value === "string" && value.trim().length === 0) return false;
-    if (typeof value === "string")
-        return true;
-};
-
 const isValidBody = function (body) {
     return Object.keys(body).length > 0
 }
@@ -28,20 +21,32 @@ const createCollege = async (req, res) => {
 
         let { name, fullName, logoLink } = data
 
-        if (!name) return res.status(400).send({ status: false, message: "Name Is required" });
-        if (!isValid(name)) return res.status(400).send({ status: false, Error: "Name is Invalid" })
+         //-------[ Name Validation]
+
+         if (!name) return res.status(400).send({ status: false, message: "Name Is required" });
+         if (!(/[A-Za-z\s]{1,}[\.]{0,1}[A-Za-z\s]{0,}$/.test(name)))
+         return res.status(400).send({ status: false, message: "Name is Invalid" })
+
+          //-------[ Name Validation]
+
         let checkId = await collegeModel.findOne({name: name})
         if (checkId) return res.status(400).send({ status: false, message: "College name is already present" })
 
+         //-------[ FullName Validation]
+
         if (!fullName) return res.status(400).send({ status: false, message: "Full Name Is required" });
-        if (!isValid(fullName)) return res.status(400).send({ status: false, Error: "Full Name is Invalid" })
+        if (!(/[A-Za-z\s]{1,}[\.]{0,1}[A-Za-z\s]{0,}$/.test(fullName)))
+        return res.status(400).send({ status: false, message: "Full Name is Invalid" })
+
+         //-------[ Link Validation]
 
         if (!logoLink) return res.status(400).send({ status: false, message: "Logo Link Is required" });
         if (!isValidUrl(logoLink))
             return res.status(400).send({ status: false, message: "Logo Link is Invalid" })
 
-        let savedData = await collegeModel.create(data)
+         //-------[ Create ]
 
+        let savedData = await collegeModel.create(data)
         res.status(201).send({ status: true, data: savedData })
 
     } catch (err) {
@@ -55,7 +60,7 @@ const collegeDetails = async function (req, res) {
     try {
 
         let filters = req.query.name;
-
+        
         if(!filters) return res.status(400).send({status: false, message: "please provide query to search"})
         
         let data = await collegeModel.findOne({name : filters})
