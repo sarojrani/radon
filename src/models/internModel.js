@@ -8,7 +8,7 @@ const internSchema = new mongoose.Schema({
 
    mobile: {type: String, required: true, unique: true},
 
-   collegId: {type: ObjectId, ref: "College" },
+   collegId: {type: ObjectId, ref: 'College'},
 
    isDeleted: {type: Boolean, default:false},
   
