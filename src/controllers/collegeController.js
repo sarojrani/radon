@@ -21,30 +21,30 @@ const createCollege = async (req, res) => {
 
         let { name, fullName, logoLink } = data
 
-         //-------[ Name Validation]
+        //-------[ Name Validation]
 
-         if (!name) return res.status(400).send({ status: false, message: "Name Is required" });
-         if (!(/[A-Za-z\s]{1,}[\.]{0,1}[A-Za-z\s]{0,}$/.test(name)))
-         return res.status(400).send({ status: false, message: "Name is Invalid" })
+        if (!name) return res.status(400).send({ status: false, message: "Name Is required" });
+        if (!(/^[A-Za-z]+$/.test(name)))
+            return res.status(400).send({ status: false, message: "Name is Invalid" })
 
-          //-------[ Name Validation]
+        //-------[ Name Validation]
 
-        let checkId = await collegeModel.findOne({name: name})
+        let checkId = await collegeModel.findOne({ name: name })
         if (checkId) return res.status(400).send({ status: false, message: "College name is already present" })
 
-         //-------[ FullName Validation]
+        //-------[ FullName Validation]
 
         if (!fullName) return res.status(400).send({ status: false, message: "Full Name Is required" });
-        if (!(/[A-Za-z\s]{1,}[\.]{0,1}[A-Za-z\s]{0,}$/.test(fullName)))
-        return res.status(400).send({ status: false, message: "Full Name is Invalid" })
+        if (!(/^[A-Za-z_ (,)]+$/.test(fullName)))
+            return res.status(400).send({ status: false, message: "Full Name is Invalid" })
 
-         //-------[ Link Validation]
+        //-------[ Link Validation]
 
         if (!logoLink) return res.status(400).send({ status: false, message: "Logo Link Is required" });
         if (!isValidUrl(logoLink))
             return res.status(400).send({ status: false, message: "Logo Link is Invalid" })
 
-         //-------[ Create ]
+        //-------[ Create ]
 
         let savedData = await collegeModel.create(data)
         res.status(201).send({ status: true, data: savedData })
@@ -60,26 +60,32 @@ const collegeDetails = async function (req, res) {
     try {
 
         let filters = req.query.name;
-        
-        if(!filters) return res.status(400).send({status: false, message: "please provide query to search"})
-        
-        let data = await collegeModel.findOne({name : filters})
-        
-        if (!data) return res.status(404).send({ status: false, message: "College not found! " });
 
-        let intern = await internModel.find({collegeId:data._id.toString()}).select({name : 1, email: 1, mobile : 1})
+        if (!filters) return res.status(400).send({ status: false, message: "please provide query to search" })
 
-        let {name, fullName, logoLink} = data
+        let data = await collegeModel.findOne({ name: filters })
 
-       let list = {name, fullName, logoLink, intern}
+        if (!data) return res.status(404).send({ status: false, message: "College not found!" });
+
+        let intern = await internModel.find({ collegeId: data._id.toString() }).select({ name: 1, email: 1, mobile: 1 })
+
+
+        let { name, fullName, logoLink } = data
+
+        let list = { name, fullName, logoLink, intern }
+
+        if (intern.length === 0) {
+            intern[0] = "No Intern for this college"
+            return res.status(404).send({ status: false, data: list });
+        }
 
         res.status(200).send({ status: true, data: list });
 
     }
     catch (err) {
-        res.status(500).send({ message: err })
+        res.status(500).send({ status: false, message: err })
     }
 }
 
 module.exports.createCollege = createCollege
-module.exports.collegeDetails = collegeDetails
+module.exports.collegeDetails = collegeDetails          

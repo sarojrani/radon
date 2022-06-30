@@ -2,7 +2,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const route = require("./routes/route");
-const { default: mongoose } = require("mongoose");
+const mongoose = require("mongoose");
 const app = express();
 
 app.use(bodyParser.json());
@@ -16,10 +16,10 @@ mongoose
       useNewUrlParser: true,
     }
   )
-  .then(() => console.log("MongoDb is connected You are Ready To Goo buddy!"))
+  .then(() => console.log("MongoDb is Connected You are Ready To Goo buddy!"))
   .catch((err) => console.log(err.message));
 
-  
+
 app.use("/", route);
 
 app.listen(process.env.PORT || 3000, function () {
