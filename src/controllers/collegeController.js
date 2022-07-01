@@ -1,3 +1,4 @@
+// ==+==+==+==[Imports]==+==+==+==+=
 const collegeModel = require("../models/collegeModel")
 const validUrl = require('valid-url');
 const internModel = require("../models/internModel");
@@ -65,7 +66,7 @@ const collegeDetails = async function (req, res) {
 
         let data = await collegeModel.findOne({ name: filters })
 
-        if (!data) return res.status(404).send({ status: false, message: "College not found!" });
+        if (!data) return res.status(400).send({ status: false, message: "College not found!" });
 
         let intern = await internModel.find({ collegeId: data._id.toString() }).select({ name: 1, email: 1, mobile: 1 })
 
