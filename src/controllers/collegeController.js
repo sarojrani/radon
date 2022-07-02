@@ -1,6 +1,5 @@
 // ==+==+==+==[Imports]==+==+==+==+=
 const collegeModel = require("../models/collegeModel")
-const validUrl = require('valid-url');
 const internModel = require("../models/internModel");
 
 
@@ -8,9 +7,6 @@ const internModel = require("../models/internModel");
 
 const isValidBody = function (body) {
     return Object.keys(body).length > 0
-}
-const isValidUrl = function (value) {
-    if (validUrl.isUri(value)) return true
 }
 
 // ==+==+==+====+==+==+==+=[ Create College ]==+==+==+==+===+==+==+==+=
@@ -20,7 +16,7 @@ const createCollege = async (req, res) => {
         let data = req.body
         if (!isValidBody(data)) return res.status(400).send({ status: false, message: "please provide data to Create" })
 
-        let { name, fullName, logoLink } = data
+        let { name, fullName, logoLink, } = data
 
         //-------[ Name Validation]
 
@@ -42,13 +38,19 @@ const createCollege = async (req, res) => {
         //-------[ Link Validation]
 
         if (!logoLink) return res.status(400).send({ status: false, message: "Logo Link Is required" });
-        if (!isValidUrl(logoLink))
+        if (!(/(https|http?:\/\/.*\.(?:png|gif|webp|jpeg|jpg))/.test(logoLink)))
             return res.status(400).send({ status: false, message: "Logo Link is Invalid" })
 
         //-------[ Create ]
 
         let savedData = await collegeModel.create(data)
-        res.status(201).send({ status: true, data: savedData })
+        let newData = {
+            name: name, 
+            fullName: fullName, 
+            logoLink: logoLink,
+            isDeleted: false 
+        }
+        res.status(201).send({ status: true, data: newData })
 
     } catch (err) {
         res.status(500).send({ status: false, message: err.message })
@@ -60,7 +62,7 @@ const createCollege = async (req, res) => {
 const collegeDetails = async function (req, res) {
     try {
 
-        let filters = req.query.name;
+        let filters = req.query.collegeName;
 
         if (!filters) return res.status(400).send({ status: false, message: "please provide query to search" })
 
@@ -68,15 +70,15 @@ const collegeDetails = async function (req, res) {
 
         if (!data) return res.status(400).send({ status: false, message: "College not found!" });
 
-        let intern = await internModel.find({ collegeId: data._id.toString() }).select({ name: 1, email: 1, mobile: 1 })
+        let interns = await internModel.find({ collegeId: data._id.toString() }).select({ name: 1, email: 1, mobile: 1 })
 
 
         let { name, fullName, logoLink } = data
 
-        let list = { name, fullName, logoLink, intern }
+        let list = { name, fullName, logoLink, interns }
 
-        if (intern.length === 0) {
-            intern[0] = "No Intern for this college"
+        if (interns.length === 0) {
+            interns[0] = "No Interns for this college"
             return res.status(404).send({ status: false, data: list });
         }
 

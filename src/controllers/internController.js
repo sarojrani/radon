@@ -56,9 +56,18 @@ const createIntern = async function (req, res) {
         if (checkMobile) return res.status(400).send({ status: false, message: "Mobile is already registerd" })
 
         //------[response]
-
+        
         let savedata = await internModel.create({ name, email, mobile, collegeId })
-        res.status(201).send({ status: true, data: savedata })
+
+        let newData = {
+            isDeleted: false, 
+            name: name, 
+            email: email, 
+            mobile: mobile, 
+            collegeId: collegeId
+        }
+
+        res.status(201).send({ status: true, data: newData })
 
     } catch (err) {
         res.status(500).send({ status: false, message: err.message })

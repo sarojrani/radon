@@ -6,7 +6,7 @@ const mongoose = require("mongoose");
 const app = express();
 
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+
 
 // ==+==+==+==+==+==+==+==+==+==[Connect DataBase]==+==+==+==+==+==+==+==+==+==
 mongoose
@@ -25,3 +25,5 @@ app.use("/", route);
 app.listen(process.env.PORT || 3000, function () {
   console.log("Yuhoo! Express app is running on port " + (process.env.PORT || 3000));
 });
+
+// 
