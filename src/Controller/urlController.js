@@ -16,10 +16,7 @@ const urlShorten = async function (req,res){
             urlCode
         })
         let result = await urlModel.create(url)
-        return res.status(201).send({status:true,msg:url})
-
-
-
+        return res.status(201).send({status:true,msg:result})
 
     } catch(err){
         res.status(500).send({status:false,error:err.message})
