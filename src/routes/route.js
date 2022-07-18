@@ -7,7 +7,8 @@ router.get("/test-api", function(req,res){
     res.send("This is my ist api")
 })
 
-router.post("/url/shorten",urlController.urlShorten)
+router.post("/url/shorten",urlController.urlShorten);
+router.get("/:urlCode",urlController.getUrl)
 
 
 
