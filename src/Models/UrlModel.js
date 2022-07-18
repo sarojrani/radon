@@ -1,6 +1,7 @@
+//--------------Imports--------------------//
 const mongoose = require ("mongoose");
 
-
+//----------------CreatingModel
 const urlSchema = new mongoose.Schema({
     urlCode: {
         type:String,
@@ -21,4 +22,5 @@ const urlSchema = new mongoose.Schema({
     }
 },{timestamps:true})
 
+//---------------------Export
 module.exports = mongoose.model('URL',urlSchema )
