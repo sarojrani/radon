@@ -13,5 +13,10 @@ router.get("/test-api", function(req,res){
 router.post("/url/shorten",urlController.urlShorten);
 router.get("/:urlCode",urlController.getUrl)
 
+//if user will hit wrong url
+router.all("/**",function(req,res){
+    res.status(404).send({status:false,msg:"No such site exist"})
+})
+
 //---------------Export
 module.exports=router

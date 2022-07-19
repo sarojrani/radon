@@ -2,19 +2,21 @@
 const urlModel = require("../Models/UrlModel");
 const shortId = require("shortid");
 const UrlModel = require("../Models/UrlModel");
+const validator = require("validator");
 
 //----------------createURL
 
 const urlShorten = async function (req, res) {
     try {
-        let { longUrl } = req.body;
-
+        
+        let data=req.body
+        let { longUrl } = data
+        if(!Object.keys(data).length) return res.status(400).send({ status: false, msg: "Please provide url to search" })
 //--------------------URL Validation
 
-        if (!/^(http(s)?:\/\/)?(www.)?([a-zA-Z0-9])+([\-\.]{1}[a-zA-Z0-9]+)\.[a-zA-Z]{2,5}(:[0-9]{1,5})?(\/[^\s])?$/.test(longUrl))
-        return res.status(400).send({ status: false, msg: "Not Valid Url" })
-        if (!longUrl) return res.status(400).send({ status: false, msg: "Please provide url to search" })
-
+        if (!validator.isURL(longUrl)) 
+        return res.status(400).send({status:false,msg:"Not Valid Url"})
+      
 //----------------------DB Call
 
         let urlFind = await urlModel.findOne({ longUrl })
@@ -39,10 +41,10 @@ const urlShorten = async function (req, res) {
 
 const getUrl = async function (req, res) {
     try {
-        let code=req.params
+        let code=req.params.urlCode
 //---------------urlcode validation
 
-        if(!shortId.isValid(code)) return res.status(400).send({status:false,msg:"Invalid Id"})
+       if(!shortId.isValid(code)) return res.status(400).send({status:false,msg:"Invalid Id"})
         let result = await urlModel.findOne({ urlCode: req.params.urlCode })
         if (!result) return res.status(404).send({ status: false, msg: "URL is not present in data base" })
         if (result) return res.status(302).redirect(result.longUrl )
