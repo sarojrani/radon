@@ -28,8 +28,8 @@ const { promisify } = require("util");
 
 //Connection setup for redis
 
-    const SET_ASYNC = promisify(redisClient.SET).bind(redisClient);
-    const GET_ASYNC = promisify(redisClient.GET).bind(redisClient);
+const SET_ASYNC = promisify(redisClient.SET).bind(redisClient);
+const GET_ASYNC = promisify(redisClient.GET).bind(redisClient);
 
 //----------------createURL
 
@@ -46,13 +46,13 @@ const urlShorten = async function (req, res) {
 
         //----------------------DB Call
 
-        let urlFind = await urlModel.findOne({longUrl},{urlCode:1,longUrl:1,shortUrl:1})
+        let urlFind = await urlModel.findOne({longUrl},{urlCode:1,longUrl:1,shortUrl:1,_id:0})
         
         
        // console.log(urlFind)
        
-        if (urlFind) return res.status(200).send({status:true,data:urlFind.shortUrl })
-        const baseUrl = `https://localhost:3000`
+        if (urlFind) return res.status(200).send({data:urlFind })
+        const baseUrl = `${req.protocol}://${req.headers.host}`
         const urlCode = shortId.generate()
         const shortUrl = baseUrl + '/' + urlCode
         url = new UrlModel({
@@ -78,16 +78,15 @@ const getUrl = async function (req, res) {
         if (!shortId.isValid(code)) return res.status(400).send({ status: false, message: "Invalid Id" })
         let validUrl = await urlModel.findOne({urlCode: req.params.urlCode })
         if (!validUrl) return res.status(404).send({ status: false, message: "URL is not present in data base" })
-        //-----------------Caching
-        let cahcedurlData = await GET_ASYNC(`${req.params.urlCode}`)
-        let casheData = JSON.parse(cahcedurlData)
+
+        //------------------Caching
+        let casheData = await GET_ASYNC(`${code}`)
         console.log(casheData)
-        if (cahcedurlData) {res.status(302).redirect(casheData.longUrl)}
-         else {
-            let urlData = await urlModel.findOne({ urlCode: req.params.urlCode },{longUrl:1,_id:0});
-            await SET_ASYNC(`${req.params.urlCode}`, urlData.longUrl)
-            res.status(302).redirect(urlData.longUrl);
-        }
+        if(casheData) return res.status(302).redirect(casheData)
+        const findURL = await urlModel.findOne({code})
+        await SET_ASYNC(`${code}`,findURL.longUrl)
+        return res.status(302).redirect(findURL.longUrl)
+       
 
     } catch (err) {
         return res.status(500).send({ status: false, error: err.message })
