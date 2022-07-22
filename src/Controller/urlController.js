@@ -1,7 +1,6 @@
 //----------------------Imports------------------------//
 const urlModel = require("../Models/UrlModel");
 const shortId = require("shortid");
-const UrlModel = require("../Models/UrlModel");
 const validator = require("validator");
 const redis = require("redis");
 const { promisify } = require("util");
@@ -47,21 +46,18 @@ const urlShorten = async function (req, res) {
         //----------------------DB Call
 
         let urlFind = await urlModel.findOne({longUrl},{urlCode:1,longUrl:1,shortUrl:1,_id:0})
-        
-        
-       // console.log(urlFind)
-       
-        if (urlFind) return res.status(200).send({data:urlFind })
+        if (urlFind) return res.status(201).send({data:urlFind })
         const baseUrl = `${req.protocol}://${req.headers.host}`
         const urlCode = shortId.generate()
         const shortUrl = baseUrl + '/' + urlCode
-        url = new UrlModel({
+        url = new urlModel({
             longUrl,
             shortUrl,
             urlCode
         })
         let result = await urlModel.create(url)
-        return res.status(201).send({ data: {urlCode:result.urlCode,longUrl:result.longUrl,shortUrl:result.shortUrl}})
+        
+        return res.status(201).send({ data: {urlCode:result.urlCode,longUrl:result.longUrl,shortUrl:result,shortUrl}})
 
     } catch (err) {
         res.status(500).send({ status: false, error: err.message })
@@ -101,7 +97,7 @@ const urlShorten = async function (req, res) {
 const getUrl = async function (req, res) {
     try {
         let code = req.params.urlCode
-        console.log(code)
+    
         //---------------urlcode validation
 
         if (!shortId.isValid(code)) return res.status(400).send({ status: false, message: "Invalid URLcode" })
@@ -110,10 +106,9 @@ const getUrl = async function (req, res) {
 
         //------------------Caching
         let casheData = await GET_ASYNC(`${req.params.urlCode}`)
-        console.log(casheData)
+    
         if(casheData) return res.status(302).redirect(casheData)
-        const findURL = await urlModel.findOne({urlCode: req.params.urlCode})
-        console.log(findURL)
+        const findURL = await urlModel.findOne({urlCode: req.params.urlCode})       
         await SET_ASYNC(`${req.params.urlCode}`,findURL.longUrl)
         return res.status(302).redirect(findURL.longUrl)
        
