@@ -46,10 +46,10 @@ const urlShorten = async function (req, res) {
         //----------------------DB Call
 
         let urlFind = await urlModel.findOne({longUrl},{urlCode:1,longUrl:1,shortUrl:1,_id:0})
-        if (urlFind) return res.status(201).send({data:urlFind })
+        if (urlFind) return res.status(200).send({data:urlFind })
         const baseUrl = `${req.protocol}://${req.headers.host}`
         const urlCode = shortId.generate()
-        const shortUrl = baseUrl + '/' + urlCode
+        const shortUrl = baseUrl + '/' + urlCodeg
         let url= { longUrl,shortUrl, urlCode }
         
         let result = await urlModel.create(url)
