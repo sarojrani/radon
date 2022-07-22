@@ -50,14 +50,11 @@ const urlShorten = async function (req, res) {
         const baseUrl = `${req.protocol}://${req.headers.host}`
         const urlCode = shortId.generate()
         const shortUrl = baseUrl + '/' + urlCode
-        url = new urlModel({
-            longUrl,
-            shortUrl,
-            urlCode
-        })
+        let url= { longUrl,shortUrl, urlCode }
+        
         let result = await urlModel.create(url)
         
-        return res.status(201).send({ data: {urlCode:result.urlCode,longUrl:result.longUrl,shortUrl:result,shortUrl}})
+        return res.status(201).send({ status: true,data: url})
 
     } catch (err) {
         res.status(500).send({ status: false, error: err.message })
